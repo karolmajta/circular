@@ -4,17 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_PATH=src/js $(npm bin)/vows test/**/*Vows.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "browserify": "^10.2.4",
     "canvas": "^1.2.3",
+    "chai": "^3.0.0",
+    "expect.js": "^0.3.1",
     "gulp": "^3.9.0",
     "immutable": "^3.7.4",
     "paper": "git+ssh://git@github.com:karolmajta/paper.js.git#master",
     "uglifyify": "^3.0.1",
-    "vinyl-source-stream": "^1.1.0"
+    "uuid": "^2.0.1",
+    "vinyl-source-stream": "^1.1.0",
+    "vows": "^0.8.1"
   }
 }
