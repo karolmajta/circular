@@ -11,15 +11,15 @@ window.randFrom = function (start, stop) {
 
 var world = models.world.World({
   orbits: I.OrderedMap([
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 20*5, dr: -30, ds: randFrom(-30, 30)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 30*5, dr: -30, ds: randFrom(-30, 30)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 40*5, dr: -30, ds: randFrom(-30, 30)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 50*5, dr: -30, ds: randFrom(-30, 30)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 60*5, dr: -30, ds: randFrom(-30, 30)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 70*5, dr: -30, ds: randFrom(-30, 30)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 80*5, dr: -30, ds: randFrom(-30, 30)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 90*5, dr: -30, ds: randFrom(-30, 30)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 100*5, dr: -30, ds: randFrom(-30, 30)})]
+    [models.orbit.Orbit(), models.world.RadialCoords({r: 20*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [models.orbit.Orbit(), models.world.RadialCoords({r: 30*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [models.orbit.Orbit(), models.world.RadialCoords({r: 40*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [models.orbit.Orbit(), models.world.RadialCoords({r: 50*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [models.orbit.Orbit(), models.world.RadialCoords({r: 60*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [models.orbit.Orbit(), models.world.RadialCoords({r: 70*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [models.orbit.Orbit(), models.world.RadialCoords({r: 80*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [models.orbit.Orbit(), models.world.RadialCoords({r: 90*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [models.orbit.Orbit(), models.world.RadialCoords({r: 100*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})]
   ])
 });
 
@@ -31,12 +31,19 @@ var drawLoop = function (window, stage, renderer) {
   stage.removeChildren();
 
   world.get('orbits').forEach(function (coords) {
-    var graphics = new PIXI.Graphics();
-    // draw a circle
-  	graphics.lineStyle(1, 0xff0000);
-  	graphics.drawCircle(renderer.width/2, renderer.height/2, coords.get('r'));
-
-    stage.addChild(graphics);
+    var orbit = new PIXI.Container();
+    var circle = new PIXI.Graphics();
+    circle.lineStyle(1, 0xff0000);
+  	circle.drawCircle(0, 0, coords.get('r'));
+    orbit.addChild(circle);
+    var marker = new PIXI.Graphics();
+    marker.lineStyle(0);
+    marker.beginFill(0xff0000);
+    marker.drawCircle(coords.get('r'), 0, 3);
+    orbit.addChild(circle);
+    orbit.addChild(marker);
+    orbit.rotation = coords.get('s');
+    stage.addChild(orbit);
   });
 
   renderer.render(stage);
@@ -49,10 +56,12 @@ var drawLoop = function (window, stage, renderer) {
 };
 
 window.onload = function() {
-  var stage = new PIXI.Stage(0xFFFFFF, true);
   var $gameContainer = $('#gameContainer');
   var width = $gameContainer.width();
   var height = $gameContainer.height();
+  var stage = new PIXI.Container(0xFFFFFF, true);
+  stage.position.x = width/2;
+  stage.position.y = height/2;
 	var renderer = PIXI.autoDetectRenderer(width, height);
 
 	document.getElementById('gameContainer').appendChild(renderer.view);

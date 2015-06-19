@@ -38,7 +38,7 @@ var tick = function (world, dt) {
   if (appendCount > 0) {
     activeOrbits = activeOrbits.set(
       orbit.Orbit(),
-      RadialCoords({r: activeOrbits.last().get('r')+10*5, dr: -30, ds: randFrom(-30, 30)})
+      RadialCoords({r: activeOrbits.last().get('r')+10*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})
     )
   }
 
