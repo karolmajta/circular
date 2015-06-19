@@ -1,6 +1,6 @@
 module.exports = {
-  Obstacle: require('./Obstacle'),
-  Player: require('./Player'),
-  Orbit: require('./Orbit'),
-  World: require('./World'),
+  obstacle: require('./obstacle'),
+  player: require('./player'),
+  orbit: require('./orbit'),
+  world: require('./world'),
 }

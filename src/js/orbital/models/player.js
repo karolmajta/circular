@@ -5,10 +5,8 @@ var factory = require('./factory');
 
 var Player = I.Record({
   uuid: null,
-  velocity: 0
 });
 
-var iPlayer = {};
-
-
-module.exports = factory(Player, iPlayer);
+module.exports = {
+  Player: factory(Player)
+};
