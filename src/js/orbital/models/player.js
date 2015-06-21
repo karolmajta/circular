@@ -3,10 +3,12 @@ var I = require('immutable');
 var factory = require('./factory');
 
 
-var Player = I.Record({
+var PlayerCoords = I.Record({
   uuid: null,
+  s: 0,
+  ds: 0
 });
 
 module.exports = {
-  Player: factory(Player)
+  PlayerCoords: factory(PlayerCoords)
 };

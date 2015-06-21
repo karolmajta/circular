@@ -24,7 +24,7 @@ var RadialCoords = I.Record({
 var World = I.Record({
   uuid: null,
   velocity: 0,
-  player: player.Player().set('uuid', uuid.v1()),
+  player: player.PlayerCoords().set('uuid', uuid.v1()),
   playerOrbit: null,
   playerPosition: 0,
   orbits: I.OrderedMap(),
@@ -43,7 +43,13 @@ var tick = function (world, dt) {
   }
 
   return world
-    .set('orbits', activeOrbits);
+    .set('orbits', activeOrbits)
+    .update('player', function (player) {
+      var ds = player.get('ds');
+      return player.update('s', function (s) {
+        return s + ds*dt;
+      });
+    });
 };
 
 var tickOrbits = function (orbitCoordinates, dt) {

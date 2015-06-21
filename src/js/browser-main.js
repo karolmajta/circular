@@ -1,26 +1,33 @@
 var _ = require('underscore');
 var $ = require('jquery');
 var I = require('immutable');
-var models = require('./orbital/models');
 var PIXI = require('pixi.js');
+
+var models = require('./orbital/models');
+
 
 window.randFrom = function (start, stop) {
   return Math.random()*(stop-start) + start;
 };
 
 
+var orbits = I.OrderedMap([
+  [models.orbit.Orbit(), models.world.RadialCoords({r: 20*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+  [models.orbit.Orbit(), models.world.RadialCoords({r: 30*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+  [models.orbit.Orbit(), models.world.RadialCoords({r: 40*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+  [models.orbit.Orbit(), models.world.RadialCoords({r: 50*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+  [models.orbit.Orbit(), models.world.RadialCoords({r: 60*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+  [models.orbit.Orbit(), models.world.RadialCoords({r: 70*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+  [models.orbit.Orbit(), models.world.RadialCoords({r: 80*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+  [models.orbit.Orbit(), models.world.RadialCoords({r: 90*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+  [models.orbit.Orbit(), models.world.RadialCoords({r: 100*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})]
+]);
+
+
 var world = models.world.World({
-  orbits: I.OrderedMap([
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 20*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 30*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 40*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 50*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 60*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 70*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 80*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 90*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
-    [models.orbit.Orbit(), models.world.RadialCoords({r: 100*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})]
-  ])
+  orbits: orbits,
+  player: models.player.PlayerCoords({s: Math.PI*0.5, ds: 0.2}),
+  playerOrbit: I.Seq(orbits.keys()).last()
 });
 
 var t0 = new Date();
@@ -45,6 +52,16 @@ var drawLoop = function (window, stage, renderer) {
     orbit.rotation = coords.get('s');
     stage.addChild(orbit);
   });
+
+  var playerOrbitCoords = world.getIn(['orbits', world.get('playerOrbit')]);
+  if (playerOrbitCoords) {
+    var player = new PIXI.Graphics();
+    player.beginFill(0x00ff00);
+    player.drawCircle(playerOrbitCoords.get('r'), 0, 5);
+    player.rotation = world.getIn(['player', 's']);
+    console.log(world.getIn(['player', 's']));
+    stage.addChild(player);
+  }
 
   renderer.render(stage);
 
