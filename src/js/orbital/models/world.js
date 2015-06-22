@@ -2,14 +2,10 @@ var _ = require('underscore');
 var I = require('immutable');
 var uuid = require('uuid');
 
+var mu = require('./../math-utils');
 var factory = require('./factory');
 var player = require('./player');
 var orbit = require('./orbit')
-
-
-var makeOrbit = function () {
-  return [models.orbit.Orbit, models.world.RadialCoords({r: 100*5, dr: -5, ds: randFrom(-10, 10)})]
-}
 
 
 var RadialCoords = I.Record({
@@ -26,11 +22,36 @@ var World = I.Record({
   velocity: 0,
   player: player.PlayerCoords().set('uuid', uuid.v1()),
   playerOrbit: null,
-  playerPosition: 0,
   orbits: I.OrderedMap(),
 });
 
-var tick = function (world, dt) {
+var tick = function (world, dt, events) {
+  // we should have some more serious event dispatching logic
+  // and they probably should be some sort of "domain events"
+  events.forEach(function (e) {
+      console.log(e);
+      if (e.keyCode == 39 || e.keyCode == 37) {
+        world = world.updateIn(['player', 'ds'], function (ds) { return -ds });
+      }
+      if (e.type == 'touchstart' || e.keyCode == 38) {
+        var nextOrbit = I.Seq(world.get('orbits').keys()).skipWhile(function (o) {
+          return !o.equals(world.get('playerOrbit'))
+        }).skip(1).first();
+        if (nextOrbit) {
+          world = world.set('playerOrbit', nextOrbit);
+        }
+      }
+      if (e.keyCode == 40) {
+        var nextOrbit = I.Seq(world.get('orbits').keys()).reverse().skipWhile(function (o) {
+          return !o.equals(world.get('playerOrbit'))
+        }).skip(1).first();
+        if (nextOrbit) {
+          world = world.set('playerOrbit', nextOrbit);
+        }
+      }
+  });
+
+
   var originalOrbits = world.get('orbits');
   var tickedOrbits = tickOrbits(originalOrbits, dt);
   var activeOrbits = dropOrbits(tickedOrbits, 10*5);
@@ -38,7 +59,7 @@ var tick = function (world, dt) {
   if (appendCount > 0) {
     activeOrbits = activeOrbits.set(
       orbit.Orbit(),
-      RadialCoords({r: activeOrbits.last().get('r')+10*5, dr: -30, ds: randFrom(-0.2*Math.PI, 0.2*Math.PI)})
+      RadialCoords({r: activeOrbits.last().get('r')+10*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})
     )
   }
 
