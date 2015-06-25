@@ -4,9 +4,9 @@ var _ = gulp = require('gulp'),
         browserify = require('browserify');
 
 gulp.task('index', function () {
-  return gulp.src('./src/html/index.html')
-    .pipe(gulp.dest('./dist'))
-    .pipe(connect.reload());
+    return gulp.src('./src/html/**/*.html')
+        .pipe(gulp.dest('./dist'))
+        .pipe(connect.reload());
 });
 
 

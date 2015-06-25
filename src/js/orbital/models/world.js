@@ -3,24 +3,13 @@ var I = require('immutable');
 var uuid = require('uuid');
 
 var mu = require('./../math-utils');
-var factory = require('./factory');
 var player = require('./player');
-var orbit = require('./orbit')
-
-
-var RadialCoords = I.Record({
-  uuid: null,
-  r: 0,
-  s: 0,
-  dr: 0,
-  ds: 0
-})
+var orbit = require('./orbit');
 
 
 var World = I.Record({
-  uuid: null,
   velocity: 0,
-  player: player.PlayerCoords().set('uuid', uuid.v1()),
+  player: player.Player(),
   playerOrbit: null,
   orbits: I.OrderedMap(),
 });
@@ -29,21 +18,12 @@ var tick = function (world, dt, events) {
   // we should have some more serious event dispatching logic
   // and they probably should be some sort of "domain events"
   events.forEach(function (e) {
-      console.log(e);
-      if (e.keyCode == 39 || e.keyCode == 37) {
+      if (e == 'REVERT') {
         world = world.updateIn(['player', 'ds'], function (ds) { return -ds });
       }
-      if (e.type == 'touchstart' || e.keyCode == 38) {
+      if (e == 'JUMP') {
         var nextOrbit = I.Seq(world.get('orbits').keys()).skipWhile(function (o) {
-          return !o.equals(world.get('playerOrbit'))
-        }).skip(1).first();
-        if (nextOrbit) {
-          world = world.set('playerOrbit', nextOrbit);
-        }
-      }
-      if (e.keyCode == 40) {
-        var nextOrbit = I.Seq(world.get('orbits').keys()).reverse().skipWhile(function (o) {
-          return !o.equals(world.get('playerOrbit'))
+          return o != world.get('playerOrbit');
         }).skip(1).first();
         if (nextOrbit) {
           world = world.set('playerOrbit', nextOrbit);
@@ -57,10 +37,15 @@ var tick = function (world, dt, events) {
   var activeOrbits = dropOrbits(tickedOrbits, 10*5);
   var appendCount = tickedOrbits.count() - activeOrbits.count();
   if (appendCount > 0) {
+    var newOrbit = orbit.Orbit({
+      r: activeOrbits.last().get('r')+10*5,
+      dr: -90,
+      ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)
+    });
     activeOrbits = activeOrbits.set(
-      orbit.Orbit(),
-      RadialCoords({r: activeOrbits.last().get('r')+10*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})
-    )
+      uuid.v1(),
+      newOrbit
+    );
   }
 
   return world
@@ -100,8 +85,9 @@ var spawnOrbits = function (orbitCoordinates, expectedCount) {
 
 
 module.exports = {
-  World: factory(World),
-  RadialCoords: factory(RadialCoords),
+  World: World,
   tick: tick,
-  tickOrbits: tickOrbits
+  _tickOrbits: tickOrbits,
+  _dropOrbits: dropOrbits,
+  _spawnOrbits: spawnOrbits
 };
