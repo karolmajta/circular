@@ -13,7 +13,7 @@ var Timer = function () {
       dt = t1 - t0;
       t = t1;
       sink(I.Map({t: t.getTime(), dt: dt}));
-    }, 30)
+    }, 30);
     return function () {
       clearInterval(intervalId);
     }
@@ -23,6 +23,7 @@ var Timer = function () {
 var FrameStream = function (window, timer, events) {
   var t;
   var dt = 0;
+  var paused = true;
   var eventBuffer = I.List();
   timer.onValue(function (v) {
     t = v.get('t');
@@ -32,21 +33,28 @@ var FrameStream = function (window, timer, events) {
     eventBuffer = eventBuffer.push(e);
   });
   var loop = function (sink) {
+    eventBuffer = I.List();
     window.requestAnimationFrame(function () {
-      sink(I.Map({t: t, dt: dt, events: eventBuffer}));
+      if (!paused) {
+        sink(I.Map({t: t, dt: dt, events: eventBuffer}));
+      }
       loop(sink);
       dt = 0;
-      eventBuffer = I.List();
     });
   };
 
-  return Bacon.fromBinder(function (sink) {
+  var stream = Bacon.fromBinder(function (sink) {
     loop(sink);
   });
-}
+
+  stream.pause = function () { paused = true; };
+  stream.start = function () { paused = false; };
+
+  return stream;
+};
 
 
 module.exports = {
     Timer: Timer,
     FrameStream: FrameStream
-}
+};

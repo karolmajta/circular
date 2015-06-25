@@ -81,12 +81,34 @@ var spawnOrbits = function (orbitCoordinates, expectedCount) {
       );
   });
   return orbitCoordinates;
-}
+};
+
+var makeDefaultWorld = function () {
+  var orbits = I.OrderedMap([
+    [uuid.v1(), orbit.Orbit({r: 20*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [uuid.v1(), orbit.Orbit({r: 30*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [uuid.v1(), orbit.Orbit({r: 40*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [uuid.v1(), orbit.Orbit({r: 50*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [uuid.v1(), orbit.Orbit({r: 60*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [uuid.v1(), orbit.Orbit({r: 70*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [uuid.v1(), orbit.Orbit({r: 80*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [uuid.v1(), orbit.Orbit({r: 90*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})],
+    [uuid.v1(), orbit.Orbit({r: 100*5, dr: -90, ds: mu.randFrom(-0.2*Math.PI, 0.2*Math.PI)})]
+  ]);
+
+
+  return World({
+    orbits: orbits,
+    player: player.Player({s: Math.PI*0.5, ds: 2}),
+    playerOrbit: I.Seq(orbits.keys()).last()
+  });
+};
 
 
 module.exports = {
   World: World,
   tick: tick,
+  makeDefaultWorld: makeDefaultWorld,
   _tickOrbits: tickOrbits,
   _dropOrbits: dropOrbits,
   _spawnOrbits: spawnOrbits

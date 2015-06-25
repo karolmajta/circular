@@ -2,11 +2,13 @@ var angular = require('angular');
 require('angular-ui-router');
 
 var mainMenuController = require('./main-menu-controller');
+var gameController = require('./game-controller');
 
 
 var app = angular.module('orbital', ['ui.router']);
 
 app.controller('mainMenuController', mainMenuController);
+app.controller('gameController', gameController);
 
 app.config(['$stateProvider',
             function ($stateProvider) {
@@ -18,8 +20,9 @@ app.config(['$stateProvider',
             controller: 'mainMenuController'
         })
         .state('game', {
-            url: '#gameContainer',
+            url: '/game/#gameContainer',
             template: '',
+            controller: 'gameController'
         });
 
 }]).run(['$state',
